@@ -1,0 +1,73 @@
+{% extends "account/base_entrance.html" %}
+{% load allauth i18n %}
+{% block head_title %}
+    {% trans "Signup" %}
+{% endblock head_title %}
+{% block content %}
+    {% element h1 %}
+        {% trans "Sign Up" %}
+    {% endelement %}
+    {% setvar link %}
+        <a href="{{ login_url }}">
+        {% endsetvar %}
+        {% setvar end_link %}
+        </a>
+    {% endsetvar %}
+    {% element p %}
+        {% blocktranslate %}Already have an account? Then please {{ link }}sign in{{ end_link }}.{% endblocktranslate %}
+    {% endelement %}
+    {% if not SOCIALACCOUNT_ONLY %}
+        {% url 'account_signup' as action_url %}
+        {% element form form=form method="post" action=action_url tags="entrance,signup" %}
+            {% slot body %}
+                {% csrf_token %}
+                {{form.non_field_errors}}
+                    <div class="data">
+                        <label>Username</label>
+                        <input type="text" name="username" required />
+                        {{form.username.errors}}
+                    </div>
+                    <div class="data">
+                        <label>Email</label>
+                        <input type="email" name="email" required />
+                        {{form.email.errors}}
+                    </div>
+                    <div class="data">
+                        <label>Password</label>
+                        <input type="password" name="password1" required />
+                        {{form.password1.errors}}
+                    </div>
+                    <div class="data">
+                        <label>Confirm Password</label>
+                        <input type="password" name="password2" required />
+                        {{form.password2.errors}}
+                    </div>
+                    <div>
+                        {{form.captcha}}
+                    </div>
+                    <div class="btn">
+                        <div class="inner"></div>
+                        <button type="submit">Signup</button>
+                    </div>
+                {{ redirect_field }}
+
+            {% endslot %}
+            {{form.captcha}}
+            {% slot actions %}
+                {% element button tags="prominent,signup" type="submit" %}
+                    {% trans "Sign Up" %}
+                {% endelement %}
+            {% endslot %}
+        {% endelement %}
+    {% endif %}
+    {% if PASSKEY_SIGNUP_ENABLED %}
+        {% element hr %}
+        {% endelement %}
+        {% element button href=signup_by_passkey_url tags="prominent,signup,outline,primary" %}
+            {% trans "Sign up using a passkey" %}
+        {% endelement %}
+    {% endif %}
+    {% if SOCIALACCOUNT_ENABLED %}
+        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+    {% endif %}
+{% endblock content %}
